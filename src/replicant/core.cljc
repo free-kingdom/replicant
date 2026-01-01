@@ -799,7 +799,9 @@
                 (recur (next new-c) (next old-c) (unchecked-inc-int n) move-n n-children changed? (conj! vdom old-vdom))
 
                 child
-                (recur (next new-c) (next old-c) (+ n 2) move-n (unchecked-inc-int n-children) true (conj! vdom child-vdom))
+                (recur (next new-c) (next old-c) (+ n 2) move-n (unchecked-inc-int n-children) true (-> vdom
+                                                                                                        (conj! child-vdom)
+                                                                                                        (conj! old-vdom)))
 
                 :else
                 (recur new-c (next old-c) (unchecked-inc-int n) move-n n-children changed? (conj! vdom old-vdom)))
