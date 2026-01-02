@@ -841,10 +841,10 @@
           ;; Old node no longer exists, remove it
           (or old-nil? (not (new-ks (vdom/rkey old-vdom))))
           (if old-nil?
-            (recur new-c (next old-c) n move-n (unchecked-dec-int n-children) changed? vdom)
-            (if-let [unmounting-node (remove-child impl unmounts el n old-vdom)]
-              (recur new-c (next old-c) (unchecked-inc-int n) move-n n-children true (conj! vdom unmounting-node))
-              (recur new-c (next old-c) n move-n (unchecked-dec-int n-children) true vdom)))
+              (recur new-c (next old-c) n move-n n-children changed? vdom)
+              (if-let [unmounting-node (remove-child impl unmounts el n old-vdom)]
+                (recur new-c (next old-c) (unchecked-inc-int n) move-n n-children true (conj! vdom unmounting-node))
+                (recur new-c (next old-c) n move-n (unchecked-dec-int n-children) true vdom)))
 
           ;; Node has moved
           :else
