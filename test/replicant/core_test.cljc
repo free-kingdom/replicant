@@ -2135,7 +2135,7 @@
     (is (= (-> (h/render
                 {:aliases {:ui/a (fn [{:keys [ui/dest replicant/alias-data]} children]
                                    [:a {:href (str (:base-url alias-data) dest)} children])
-                           :ui/menu (fn [{:keys [location]} children]
+                           :ui/menu (fn [{:keys [location]} _children]
                                       (if (get-in location [:hash-params :open])
                                         [:div.relative
                                          [:ui/a {:ui/dest "/"}
