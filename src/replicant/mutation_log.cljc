@@ -182,16 +182,18 @@
    (fn [_ node]
      (:replicant/memory @node))})
 
-(defn create-renderer [{:keys [log element]}]
+(defn create-renderer [{:keys [log element callbacks]}]
   (with-meta
     {:log (or log (atom []))
      :element (or element (atom {}))
-     :callbacks (atom [])}
+     :callbacks (or callbacks (atom []))}
     mutation-log-impl))
 
-(defn render [element new-hiccup & [old-vdom {:keys [unmounts aliases on-alias-exception]}]]
+(defn render [element new-hiccup & [old-vdom {:keys [unmounts aliases on-alias-exception callbacks]}]]
   (let [el (atom (or element {}))
-        renderer (create-renderer {:log (atom []) :element el})]
+        renderer (create-renderer {:log (atom [])
+                                   :element el
+                                   :callbacks callbacks})]
     (-> (d/reconcile renderer el new-hiccup old-vdom {:unmounts unmounts
                                                       :aliases aliases
                                                       :on-alias-exception on-alias-exception})

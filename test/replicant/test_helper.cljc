@@ -125,7 +125,8 @@
     vdom
     {:unmounts unmounts
      :aliases aliases
-     :on-alias-exception on-alias-exception})))
+     :on-alias-exception on-alias-exception
+     :callbacks (:callbacks el)})))
 
 (defn text-node-event? [event]
   (or (= :create-text-node (first event))
