@@ -1750,7 +1750,71 @@
             [:create-text-node "Title"]
             [:append-child "Title" :to "p"]
             [:insert-before [:p "Title"] [:h1 "Title"] :in "body"]
-            [:remove-child [:h1 "Title"] :from "body"]]))))
+            [:remove-child [:h1 "Title"] :from "body"]])))
+
+  (testing "Keeps unmounting node around across multiple renders"
+    (is (= (-> (h/render
+                [:div
+                 '([:span {:replicant/unmounting
+                           {:style {:opacity 0
+                                    :transition "opacity 2s"}}}
+                    "a"])
+                 nil])
+
+               (h/render
+                [:div
+                 nil
+                 [:span "b"]])
+
+               (h/render
+                [:div
+                 '([:span "c"])
+                 [:span "b"]])
+
+               (h/render
+                [:div
+                 '([:span "d"]
+                   [:span "c"])
+                 [:span "b"]])
+
+               h/->dom)
+           [:div
+            [:span "d"]
+            [:span "c"]
+            [:span "a"] ;; Still here
+            [:span "b"]])))
+
+  (testing "Correctly removes unmounting node after multiple renders"
+    (is (= (-> (h/render
+                [:div
+                 '([:span {:replicant/unmounting
+                           {:style {:opacity 0
+                                    :transition "opacity 2s"}}}
+                    "a"])
+                 nil])
+
+               (h/render
+                [:div
+                 nil
+                 [:span "b"]])
+
+               (h/render
+                [:div
+                 '([:span "c"])
+                 [:span "b"]])
+
+               (h/render
+                [:div
+                 '([:span "d"]
+                   [:span "c"])
+                 [:span "b"]])
+
+               (h/call-callback 0)
+               h/->dom)
+           [:div
+            [:span "d"]
+            [:span "c"]
+            [:span "b"]]))))
 
 (deftest update-children-test
   (testing "Append node"
@@ -2568,4 +2632,21 @@
                 h/summarize
                 (filter (comp #{:set-attribute} first))
                 last)
-           [:set-attribute [:input ""] "default-value" nil :to 150]))))
+           [:set-attribute [:input ""] "default-value" nil :to 150])))
+
+  (testing "Removing explicit nil should not cause removal of DOM elements"
+    (is (empty? (-> (h/render
+                     [:ul
+                      '([:li {:replicant/key "a"} "a"]
+                        [:li {:replicant/key "b"} "b"]
+                        [:li {:replicant/key "c"} "c"])])
+                    (h/render
+                     [:ul
+                      '([:li {:replicant/key "a"} "a"]
+                        nil
+                        [:li {:replicant/key "c"} "c"])])
+                    (h/render
+                     [:ul
+                      '([:li {:replicant/key "a"} "a"]
+                        [:li {:replicant/key "c"} "c"])])
+                    h/get-mutation-log-events)))))
