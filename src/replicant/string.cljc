@@ -165,7 +165,7 @@
         (render-node stringifier (r/get-hiccup-headers nil hiccup) opt)
         (to-string stringifier))
 
-      (list? hiccup)
+      (seq? hiccup)
       (let [stringifier (create-renderer)]
         (doseq [hiccup-node hiccup]
           (render-node stringifier (r/get-hiccup-headers nil hiccup-node) opt))

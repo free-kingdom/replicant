@@ -259,7 +259,11 @@
 
   (testing "Renders top-level collection"
     (is (= (sut/render (list [:h1 "Hello world"] [:p "Text"]))
-           "<h1>Hello world</h1><p>Text</p>"))))
+           "<h1>Hello world</h1><p>Text</p>")))
+
+  (testing "Renders lazy seqs"
+    (is (= (sut/render (lazy-seq '([:h1 "Hello"])))
+           "<h1>Hello</h1>"))))
 
 (deftest escape-html-test
   (is (= (sut/escape-html "<script>alert(\"boom\")</script>")
