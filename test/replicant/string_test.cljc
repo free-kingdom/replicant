@@ -66,6 +66,18 @@
     (is (= (sut/render [:h1 {:title "Color"} "Red"])
            "<h1 title=\"Color\">Red</h1>")))
 
+  (testing "Escapes attribute values"
+    (is (= (sut/render [:h1 {:title "{\"foo\": \"bar\"}"} "Red"])
+           "<h1 title=\"{&#39;foo&#39;: &#39;bar&#39;}\">Red</h1>")))
+
+  (testing "Escapes style values"
+    (is (= (sut/render [:h1 {:style {:color "<xss>"}} "Hello"])
+           "<h1 style=\"color: &lt;xss&gt;;\">Hello</h1>")))
+
+  (testing "Escapes classes"
+    (is (= (sut/render [:h1 {:class ["<xss>" :round]} "Hello"])
+           "<h1 class=\"&lt;xss&gt; round\">Hello</h1>")))
+
   (testing "Ignores event handlers"
     (is (= (sut/render [:h1 {:on {:click [:doit]}} "Hello"])
            "<h1>Hello</h1>")))

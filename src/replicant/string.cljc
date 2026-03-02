@@ -40,6 +40,19 @@
       (append stringifier x)))
   stringifier)
 
+(defn escape-html
+  "Change special characters into HTML character entities.
+
+  Taken from Hiccup:
+  https://github.com/weavejester/hiccup/blob/5a6d45c17728dcbcb3aeb32ea890fd9dc1508547/src/hiccup/util.clj#L80-L88"
+  [text]
+  (-> text
+      (str/replace "&" "&amp;")
+      (str/replace "<" "&lt;")
+      (str/replace ">" "&gt;")
+      (str/replace "\"" "&#39;")
+      (str/replace "'" "&apos;")))
+
 (defn ^:no-doc render-attrs [stringifier attrs]
   (reduce-kv
    (fn [_ k v]
@@ -54,7 +67,7 @@
            :classes
            (do
              (append stringifier "class=\"")
-             (str-join stringifier " " v)
+             (str-join stringifier " " (mapv escape-html v))
              (append stringifier "\""))
 
            :style
@@ -64,34 +77,22 @@
                   (keep
                    (fn [[prop val]]
                      (when-let [val (r/get-style-val prop val)]
-                       (str (name prop) ": " val ";"))))
+                       (str (name prop) ": " (escape-html val) ";"))))
                   (str-join stringifier " "))
              (append stringifier "\""))
 
-           (if (or (number? v)
-                   (and (string? v) (< 0 (count v))))
-             (doto stringifier
-               (append (name k))
-               (append "=\"")
-               (append v)
-               (append "\""))
-             (append stringifier (name k))))))
+           (let [num? (number? v)]
+             (if (or num? (and (string? v) (< 0 (count v))))
+               (doto stringifier
+                 (append (name k))
+                 (append "=\"")
+                 (append (cond-> v
+                           (not num?) escape-html))
+                 (append "\""))
+               (append stringifier (name k)))))))
      nil)
    nil
    attrs))
-
-(defn escape-html
-  "Change special characters into HTML character entities.
-
-  Taken from Hiccup:
-  https://github.com/weavejester/hiccup/blob/5a6d45c17728dcbcb3aeb32ea890fd9dc1508547/src/hiccup/util.clj#L80-L88"
-  [text]
-  (-> text
-      (str/replace "&" "&amp;")
-      (str/replace "<" "&lt;")
-      (str/replace ">" "&gt;")
-      (str/replace "\"" "&#39;")
-      (str/replace "'" "&apos;")))
 
 (defn ^:no-doc get-expanded-headers [opt headers]
   (when (and (qualified-keyword? (hiccup/tag-name headers))
