@@ -90,7 +90,7 @@
       (str/replace "&" "&amp;")
       (str/replace "<" "&lt;")
       (str/replace ">" "&gt;")
-      (str/replace "\"" "&quot;")
+      (str/replace "\"" "&#39;")
       (str/replace "'" "&apos;")))
 
 (defn ^:no-doc get-expanded-headers [opt headers]

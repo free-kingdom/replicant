@@ -180,7 +180,7 @@
   (testing "Escapes HTML"
     (is (= (sut/render
             [:div "<script>alert(\"boom\")</script>"])
-           "<div>&lt;script&gt;alert(&quot;boom&quot;)&lt;/script&gt;</div>")))
+           "<div>&lt;script&gt;alert(&#39;boom&#39;)&lt;/script&gt;</div>")))
 
   (testing "Passes through raw strings"
     (is (= (sut/render
@@ -267,4 +267,4 @@
 
 (deftest escape-html-test
   (is (= (sut/escape-html "<script>alert(\"boom\")</script>")
-         "&lt;script&gt;alert(&quot;boom&quot;)&lt;/script&gt;")))
+         "&lt;script&gt;alert(&#39;boom&#39;)&lt;/script&gt;")))
